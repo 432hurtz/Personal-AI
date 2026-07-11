@@ -136,6 +136,8 @@ Notes:
 - [ ] Set a real `secret_key` in `searxng/settings.yml`.
 - [ ] If you want *nothing* on disk, clear Open WebUI chat history periodically,
       or use `docker compose down -v` to nuke its volume (also deletes settings).
+      For separating/deleting/purging individual chats and memory, see
+      `docs/CONVERSATIONS.md`.
 - [ ] Consider full-disk encryption (BitLocker on Win10 Pro) — the only real
       protection if the laptop is lost, since all your chats live in
       `./open-webui`.
