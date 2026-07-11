@@ -1,0 +1,55 @@
+# SearXNG settings for Personal-AI
+#
+# Three things here are non-negotiable and are the usual reasons web search
+# "silently returns nothing":
+#   1. JSON format enabled  -> Open WebUI needs it, or results come back blank
+#   2. Tor proxy with socks5h -> hides who is asking AND resolves DNS over Tor
+#   3. A real secret_key      -> generate one (see below), don't ship the default
+#
+# Generate a secret and paste it below:
+#   PowerShell:  -join ((1..32) | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })
+#   or (Git Bash / WSL):  openssl rand -hex 32
+
+use_default_settings: true
+
+server:
+  secret_key: "CHANGE_ME_run_the_command_above_and_paste_the_hex_here"
+  limiter: false            # single local user; no need for the rate limiter
+  image_proxy: true
+
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json                  # <-- MANDATORY for Open WebUI web search
+
+# Force ALL outbound traffic through the Tor container.
+# socks5h (with the 'h') resolves DNS through Tor too, so lookups don't leak.
+outgoing:
+  request_timeout: 10.0     # Tor is slow; default is too aggressive
+  max_request_timeout: 20.0
+  pool_connections: 100
+  pool_maxsize: 20
+  proxies:
+    all://:
+      - socks5h://tor:9050
+
+# Google/Bing throw CAPTCHAs at Tor exit nodes. Disable them; lean on the
+# engines that tolerate exits. arxiv is here because you want research.
+engines:
+  - name: google
+    disabled: true
+  - name: bing
+    disabled: true
+  - name: duckduckgo
+    disabled: false
+  - name: brave
+    disabled: false
+  - name: mojeek
+    disabled: false
+  - name: wikipedia
+    disabled: false
+  - name: arxiv
+    disabled: false
+  - name: semantic scholar
+    disabled: false
