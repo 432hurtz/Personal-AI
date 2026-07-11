@@ -53,6 +53,16 @@ services:
       - SCARF_NO_ANALYTICS=true
       - DO_NOT_TRACK=true
       - ENABLE_OPENAI_API=false      # no external model providers
+      # Route Open WebUI's OWN outbound traffic through Tor. Without this, the
+      # web-search RAG page fetch leaves from your real IP even though the
+      # SEARCH QUERY went via Tor. tor:8118 is the torproxy container's HTTP
+      # (Privoxy) port. NO_PROXY keeps local/Ollama/SearXNG traffic direct.
+      - HTTP_PROXY=http://tor:8118
+      - HTTPS_PROXY=http://tor:8118
+      - http_proxy=http://tor:8118
+      - https_proxy=http://tor:8118
+      - NO_PROXY=localhost,127.0.0.1,host.docker.internal,searxng,ollama,.local
+      - no_proxy=localhost,127.0.0.1,host.docker.internal,searxng,ollama,.local
       # Web search via our Tor-routed SearXNG
       - ENABLE_RAG_WEB_SEARCH=true
       - RAG_WEB_SEARCH_ENGINE=searxng

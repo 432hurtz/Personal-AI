@@ -50,7 +50,8 @@ docker compose up -d
 
 - **[docs/SETUP-WINDOWS.md](docs/SETUP-WINDOWS.md)** — step-by-step for your laptop
 - **[guardrails/policy.md](guardrails/policy.md)** — how the guardrails actually enforce
-- **[docs/PRIVACY.md](docs/PRIVACY.md)** — what "absolute privacy" does and doesn't mean
+- **[docs/PRIVACY.md](docs/PRIVACY.md)** — what "absolute privacy" does and doesn't mean, incl. what your ISP/websites can see
+- **[docs/REMOTE-ACCESS.md](docs/REMOTE-ACCESS.md)** — SSH from your phone (LAN or Tailscale), no open ports
 - **[docs/CODING.md](docs/CODING.md)** — connect VS Code / Aider to local Ollama
 - **[docs/HARDWARE.md](docs/HARDWARE.md)** — honest speed expectations + upgrade path
 

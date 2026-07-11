@@ -35,6 +35,46 @@ Tor changes *who appears to be asking*, not *whether someone asked*:
 So: **"who is asking" is hidden; "that a query happened" is not.** For pure
 local Q&A with the globe toggle OFF, nothing leaves the machine at all.
 
+## What your ISP and the websites you research can see
+
+You said you hate ISP and website tracking, so here's the exact accounting.
+
+**Your ISP sees:**
+- That you connect to the **Tor network** (the entry/guard node). It sees you
+  *use* Tor — not what you search, not which sites you read, not the content.
+  This is unavoidable with Tor and is the price of hiding everything else. (If
+  even "uses Tor" is too much for your threat model, a Tor bridge hides that
+  too — out of scope here, ask if you want it.)
+- A few **one-time clearnet downloads** during setup: Docker pulling the
+  container images, and Ollama pulling models from `ollama.com`. These are not
+  routed through Tor (doing so is slow and fragile). Your ISP sees you
+  downloaded "some Docker images" and "some Ollama models" — not your usage.
+  After setup, day-to-day research traffic is all Tor.
+
+**The websites you research see:**
+- A **Tor exit node's IP**, not yours — for both the search query *and* (now)
+  the page-content fetch. This was the one real leak in the original setup:
+  Open WebUI fetches the pages behind search results to feed RAG, and that
+  fetch used to leave from your real IP. It's now forced through Tor via
+  `HTTP_PROXY=http://tor:8118` on the Open WebUI container. So the sites you
+  actually read no longer see your address.
+- No browser fingerprint from you, because *you* never load the page — Open
+  WebUI does, server-side. SearXNG also proxies result images
+  (`image_proxy: true`), so your browser doesn't fetch remote images directly.
+
+**Trade-off:** routing page fetches through Tor makes research slower, and some
+sites block Tor exits outright (you'll occasionally get a page that won't load).
+That's the cost of not leaking your IP. To turn it off, delete the four
+`*_PROXY` / `*_proxy` lines from `docker-compose.yml` and `docker compose up -d`
+again — search stays on Tor, only the page fetch goes direct.
+
+**One first-run note:** the first time you use RAG, Open WebUI downloads a small
+embedding model. With the proxy on, that download goes over Tor (slow but
+private). If it stalls, either wait it out once, or switch embeddings to your
+local Ollama so nothing is downloaded at all: set
+`RAG_EMBEDDING_ENGINE=ollama` and `RAG_EMBEDDING_MODEL=nomic-embed-text` in the
+compose file and `ollama pull nomic-embed-text`.
+
 ## Onion (dark web) search
 
 Because egress is `socks5h` through Tor, the transport can reach `.onion`
