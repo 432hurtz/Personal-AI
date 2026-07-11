@@ -9,7 +9,7 @@
 #   ollama run joe
 
 param(
-  [string]$Base = "qwen2.5-coder:7b",   # base model to wrap
+  [string]$Base = "qwen2.5-coder:3b",   # base model to wrap (3b = fast daily driver)
   [string]$Name = "joe",        # name of your guarded model
   [int]$NumCtx  = 4096,                 # context window (keep modest on CPU)
   [double]$Temperature = 0.4,           # lower = more deterministic

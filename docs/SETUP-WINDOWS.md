@@ -57,25 +57,30 @@ the CPU is what makes it slow. Keep `num_ctx` at 4096.
    ```
    Ollama runs as a background service on `127.0.0.1:11434`.
 
-## Step 3 — Pull models and build your guarded model
+## Step 3 — Pull models and build your Joes
 
 ```powershell
 cd <path-to>\personal-ai
 
-# Pull a daily driver and a coder
-ollama pull gemma3:4b
-ollama pull qwen2.5-coder:3b
-
 # Local embeddings for web-search RAG -- keeps everything offline (small, fast)
 ollama pull nomic-embed-text
 
-# Wrap the coder with YOUR guardrails -> creates model "joe"
-.\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name joe
+# Build BOTH Joes (fast + smart) with your guardrails + personality.
+# This pulls qwen2.5-coder:3b and :7b for you.
+.\scripts\build-joes.ps1
 ```
 
+This creates two models you can switch between (Step 6):
+
+- **`joe`** — fast daily driver (3B), ~5-9 tok/s on your CPU.
+- **`joe-7b`** — smarter but slower (7B), ~2-4 tok/s.
+
+Prefer just one? Run `.\scripts\build-guarded-model.ps1` on its own — it builds
+`joe` from the 3B by default.
+
 Edit `guardrails\system-prompt.txt` (the rules) or `guardrails\personality.txt`
-(how Joe talks/acts) any time and rerun that last command to apply the changes.
-See `guardrails\policy.md` for how the guardrails actually work.
+(how Joe talks/acts) any time and rerun the build to apply the changes. See
+`guardrails\policy.md` for how the guardrails actually work.
 
 ## Step 4 — Set the SearXNG secret
 
@@ -111,9 +116,17 @@ Give Tor a minute to bootstrap, then verify egress really goes through Tor:
 4. Set **Search Result Count = 3** and **Concurrent Requests = 2**. On your CPU,
    RAG over 5+ raw HTML pages is what stalls the model — this matters more than
    it looks.
-5. Pick the model `joe` (your guarded one) in the chat model dropdown.
+5. Pick your model from the **dropdown at the top-left of the chat** — this is
+   your model switcher, just like changing Claude models. You'll see **`joe`**
+   (fast) and **`joe-7b`** (smart); click either to switch, even mid-conversation.
+   Start on `joe` and only reach for `joe-7b` when a hard problem is worth the wait.
 
 Toggle the **globe icon** in a chat to run a Tor-routed research query.
+
+> Prettier labels (optional): Admin Panel → Settings → Models lets you set a
+> friendly display name and description per model — e.g. name them "Joe (fast)"
+> and "Joe (smart)" so the dropdown reads clearly. This is cosmetic; the
+> underlying models stay `joe` and `joe-7b`.
 
 ## Step 7 — Coding
 
