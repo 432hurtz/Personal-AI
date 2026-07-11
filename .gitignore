@@ -1,0 +1,22 @@
+# Runtime data created by the stack — never commit these
+/open-webui/
+/ollama/
+
+# SearXNG writes generated files into ./searxng; keep only settings.yml
+/searxng/*
+!/searxng/settings.yml
+
+# Never commit a real secret. Keep settings.yml with the PLACEHOLDER secret;
+# your real secret_key stays local only. (If you'd rather keep settings.yml
+# fully private, add /searxng/settings.yml here too.)
+
+# Your real Tor bridge lines stay private; keep only the example
+/tor/bridges.conf
+
+# Local build marker (per-machine record of the last guardrails build)
+/guardrails/.last-build-hash
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log

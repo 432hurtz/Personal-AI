@@ -1,0 +1,11 @@
+# Tor client config with obfs4 bridges.
+SocksPort 0.0.0.0:9050
+DataDirectory /var/lib/tor
+Log notice stdout
+
+# Use bridges and speak obfs4 so the connection doesn't look like Tor.
+UseBridges 1
+ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
+
+# Your bridge lines live here (mounted from tor/bridges.conf).
+%include /etc/tor/bridges.conf

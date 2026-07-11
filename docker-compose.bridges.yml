@@ -1,0 +1,16 @@
+# OPT-IN override: replace the default Tor proxy with a bridge-capable one that
+# obfuscates the connection (obfs4) so your ISP can't tell you're using Tor.
+#
+# Usage (from the repo root), instead of plain `docker compose up -d`:
+#   1. cp tor/bridges.conf.example tor/bridges.conf   (Windows: copy)
+#   2. paste obfs4 bridge lines into tor/bridges.conf
+#   3. docker compose -f docker-compose.yml -f docker-compose.bridges.yml up -d --build
+#
+# Everything else (SearXNG, Open WebUI) is unchanged -- this container exposes
+# the same tor:9050 (SOCKS) and tor:8118 (HTTP) that the rest of the stack uses.
+services:
+  tor:
+    image: ji-tor:bridges
+    build: ./tor
+    volumes:
+      - ./tor/bridges.conf:/etc/tor/bridges.conf:ro

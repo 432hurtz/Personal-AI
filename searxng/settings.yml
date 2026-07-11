@@ -1,0 +1,102 @@
+# SearXNG settings for The JI Project
+#
+# Three things here are non-negotiable and are the usual reasons web search
+# "silently returns nothing":
+#   1. JSON format enabled  -> Open WebUI needs it, or results come back blank
+#   2. Tor proxy with socks5h -> hides who is asking AND resolves DNS over Tor
+#   3. A real secret_key      -> generate one (see below), don't ship the default
+#
+# Generate a secret and paste it below:
+#   PowerShell:  -join ((1..32) | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })
+#   or (Git Bash / WSL):  openssl rand -hex 32
+
+use_default_settings: true
+
+server:
+  secret_key: "CHANGE_ME_run_the_command_above_and_paste_the_hex_here"
+  limiter: false            # single local user; no need for the rate limiter
+  image_proxy: true
+
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json                  # <-- MANDATORY for Open WebUI web search
+
+# Force ALL outbound traffic through the Tor container.
+# socks5h (with the 'h') resolves DNS through Tor too, so lookups don't leak.
+# using_tor_proxy: true is REQUIRED to let the onion engines below run --
+# without it SearXNG disables anything in the 'onions' category.
+outgoing:
+  request_timeout: 10.0     # Tor is slow; default is too aggressive
+  max_request_timeout: 30.0 # raised for onion engines, which are slower still
+  pool_connections: 100
+  pool_maxsize: 20
+  using_tor_proxy: true
+  proxies:
+    all://:
+      - socks5h://tor:9050
+
+# Google/Bing throw CAPTCHAs at Tor exit nodes. Disable them; lean on the
+# engines that tolerate exits. arxiv is here because you want research.
+engines:
+  - name: google
+    disabled: true
+  - name: bing
+    disabled: true
+  - name: duckduckgo
+    disabled: false
+  - name: brave
+    disabled: false
+  - name: mojeek
+    disabled: false
+  - name: wikipedia
+    disabled: false
+  - name: arxiv
+    disabled: false
+  - name: semantic scholar
+    disabled: false
+
+  # ── Onion (dark web) search — category "onions" ──────────────────────────
+  # These only run because using_tor_proxy: true is set above. They return
+  # .onion links; Open WebUI only sees them because docker-compose.yml adds
+  # &categories=general,onions to the query URL.
+
+  # Ahmia: reachable over clearnet (ahmia.fi), indexes .onion sites, and
+  # filters out abuse material (CSAM). The safe default.
+  - name: ahmia
+    engine: ahmia
+    categories: onions
+    enable_http: true
+    shortcut: ah
+    timeout: 25.0
+    disabled: false
+
+  # Torch: an onion-only index (no clearnet endpoint), no content filtering,
+  # broader but noisier and often stale.
+  # NOTE: onion addresses AND page markup rot over time. If Torch returns
+  # nothing, verify the current .onion address and update search_url / the
+  # xpaths below. See SearXNG's engine docs for the maintained values.
+  - name: torch
+    engine: xpath
+    paging: true
+    search_url: http://torchdeedp3i2jigzjdmfpn5ttjhthh5wbmda2rr3jvqjg5p77c54dqd.onion/search?query={query}&page={pageno}
+    results_xpath: //div[@class="result"]
+    url_xpath: ./h5/a/@href
+    title_xpath: ./h5/a
+    content_xpath: ./p
+    categories: onions
+    enable_http: true
+    shortcut: tch
+    timeout: 30.0
+    disabled: false
+
+  # not Evil: intentionally left OFF (unfiltered onion index). Uncomment the
+  # block below only if you decide you want it.
+  # - name: not evil
+  #   engine: not_evil
+  #   categories: onions
+  #   enable_http: true
+  #   shortcut: ne
+  #   timeout: 30.0
+  #   disabled: false

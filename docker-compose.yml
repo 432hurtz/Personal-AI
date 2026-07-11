@@ -1,0 +1,78 @@
+# The JI Project stack — Open WebUI + SearXNG + Tor (Joe runs on Ollama)
+#
+# Ollama is NOT in this file on purpose. On your Windows laptop you'll run
+# Ollama NATIVELY (see docs/SETUP-WINDOWS.md) for best CPU speed and so your
+# code editor can reach it directly at localhost:11434. Open WebUI reaches the
+# native Ollama through the special host address `host.docker.internal`.
+#
+# Everything here binds to loopback (127.0.0.1) only. Nothing is exposed to
+# your LAN. All of SearXNG's outbound traffic is forced through Tor.
+
+networks:
+  ai-net:
+    driver: bridge
+
+services:
+  # -- The exit -- SOCKS5 proxy on tor:9050, never exposed to the host
+  tor:
+    image: dperson/torproxy:latest
+    container_name: tor
+    restart: unless-stopped
+    networks: [ai-net]
+
+  # -- The eyes -- self-hosted metasearch. No host port; only Open WebUI
+  # (inside ai-net) can reach it. All queries leave via Tor.
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    networks: [ai-net]
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080/
+    depends_on: [tor]
+
+  # -- The face -- ChatGPT-style UI. Loopback only. Telemetry off.
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    networks: [ai-net]
+    ports:
+      - "127.0.0.1:3000:8080"       # loopback ONLY -- never bind 0.0.0.0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # lets the container reach native Ollama
+    volumes:
+      - ./open-webui:/app/backend/data
+    environment:
+      # Point at the NATIVE Windows Ollama, not a container
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      # Privacy: kill anonymous usage telemetry / external calls
+      - ANONYMIZED_TELEMETRY=false
+      - SCARF_NO_ANALYTICS=true
+      - DO_NOT_TRACK=true
+      - ENABLE_OPENAI_API=false      # no external model providers
+      # Route Open WebUI's OWN outbound traffic through Tor. Without this, the
+      # web-search RAG page fetch leaves from your real IP even though the
+      # SEARCH QUERY went via Tor. tor:8118 is the torproxy container's HTTP
+      # (Privoxy) port. NO_PROXY keeps local/Ollama/SearXNG traffic direct.
+      - HTTP_PROXY=http://tor:8118
+      - HTTPS_PROXY=http://tor:8118
+      - http_proxy=http://tor:8118
+      - https_proxy=http://tor:8118
+      - NO_PROXY=localhost,127.0.0.1,host.docker.internal,searxng,ollama,.local
+      - no_proxy=localhost,127.0.0.1,host.docker.internal,searxng,ollama,.local
+      # Embeddings for RAG run LOCALLY on Ollama -- nothing is downloaded from
+      # HuggingFace, nothing leaves the machine. Requires: ollama pull nomic-embed-text
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_EMBEDDING_MODEL=nomic-embed-text
+      # Web search via our Tor-routed SearXNG
+      - ENABLE_RAG_WEB_SEARCH=true
+      - RAG_WEB_SEARCH_ENGINE=searxng
+      # categories=general,onions runs BOTH clearnet and onion (Ahmia/Torch)
+      # engines. Drop ",onions" to go clearnet-only again.
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>&categories=general,onions
+      - RAG_WEB_SEARCH_RESULT_COUNT=3         # keep low on weak hardware
+      - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=2
+    depends_on: [searxng]
