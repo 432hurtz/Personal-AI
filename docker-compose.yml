@@ -56,7 +56,9 @@ services:
       # Web search via our Tor-routed SearXNG
       - ENABLE_RAG_WEB_SEARCH=true
       - RAG_WEB_SEARCH_ENGINE=searxng
-      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
+      # categories=general,onions runs BOTH clearnet and onion (Ahmia/Torch)
+      # engines. Drop ",onions" to go clearnet-only again.
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>&categories=general,onions
       - RAG_WEB_SEARCH_RESULT_COUNT=3         # keep low on weak hardware
       - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=2
     depends_on: [searxng]

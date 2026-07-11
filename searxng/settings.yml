@@ -25,11 +25,14 @@ search:
 
 # Force ALL outbound traffic through the Tor container.
 # socks5h (with the 'h') resolves DNS through Tor too, so lookups don't leak.
+# using_tor_proxy: true is REQUIRED to let the onion engines below run --
+# without it SearXNG disables anything in the 'onions' category.
 outgoing:
   request_timeout: 10.0     # Tor is slow; default is too aggressive
-  max_request_timeout: 20.0
+  max_request_timeout: 30.0 # raised for onion engines, which are slower still
   pool_connections: 100
   pool_maxsize: 20
+  using_tor_proxy: true
   proxies:
     all://:
       - socks5h://tor:9050
@@ -53,3 +56,47 @@ engines:
     disabled: false
   - name: semantic scholar
     disabled: false
+
+  # ── Onion (dark web) search — category "onions" ──────────────────────────
+  # These only run because using_tor_proxy: true is set above. They return
+  # .onion links; Open WebUI only sees them because docker-compose.yml adds
+  # &categories=general,onions to the query URL.
+
+  # Ahmia: reachable over clearnet (ahmia.fi), indexes .onion sites, and
+  # filters out abuse material (CSAM). The safe default.
+  - name: ahmia
+    engine: ahmia
+    categories: onions
+    enable_http: true
+    shortcut: ah
+    timeout: 25.0
+    disabled: false
+
+  # Torch: an onion-only index (no clearnet endpoint), no content filtering,
+  # broader but noisier and often stale.
+  # NOTE: onion addresses AND page markup rot over time. If Torch returns
+  # nothing, verify the current .onion address and update search_url / the
+  # xpaths below. See SearXNG's engine docs for the maintained values.
+  - name: torch
+    engine: xpath
+    paging: true
+    search_url: http://torchdeedp3i2jigzjdmfpn5ttjhthh5wbmda2rr3jvqjg5p77c54dqd.onion/search?query={query}&page={pageno}
+    results_xpath: //div[@class="result"]
+    url_xpath: ./h5/a/@href
+    title_xpath: ./h5/a
+    content_xpath: ./p
+    categories: onions
+    enable_http: true
+    shortcut: tch
+    timeout: 30.0
+    disabled: false
+
+  # not Evil: intentionally left OFF (unfiltered onion index). Uncomment the
+  # block below only if you decide you want it.
+  # - name: not evil
+  #   engine: not_evil
+  #   categories: onions
+  #   enable_http: true
+  #   shortcut: ne
+  #   timeout: 30.0
+  #   disabled: false

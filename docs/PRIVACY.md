@@ -35,6 +35,25 @@ Tor changes *who appears to be asking*, not *whether someone asked*:
 So: **"who is asking" is hidden; "that a query happened" is not.** For pure
 local Q&A with the globe toggle OFF, nothing leaves the machine at all.
 
+## Onion (dark web) search
+
+Because egress is `socks5h` through Tor, the transport can reach `.onion`
+services natively — Tor resolves them itself, no DNS involved. This repo enables
+two onion-indexing engines so `.onion` results show up alongside clearnet ones:
+
+- **Ahmia** — clearnet-reachable index that filters out abuse material (CSAM).
+- **Torch** — onion-only, unfiltered, broader but noisier and often stale.
+- **not Evil** — deliberately left OFF (commented out in `searxng/settings.yml`).
+
+This is turned on via `using_tor_proxy: true` in `settings.yml` plus
+`&categories=general,onions` on the query URL in `docker-compose.yml`. To go
+back to clearnet-only, drop `,onions` from that URL and rebuild.
+
+Caveats: onion indexes are sparse and stale (expect dead links), onion
+addresses rot (if Torch returns nothing, its `.onion` address in `settings.yml`
+likely needs updating), and the dark web hosts plenty you may want off this
+machine — that's what the `OFF LIMITS` block in your guardrails is for.
+
 ## Hardening checklist (optional, all local)
 
 - [ ] Confirm Tor egress: `.\scripts\verify-tor.ps1` → `IsTor:true`.
