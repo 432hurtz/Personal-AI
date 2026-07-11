@@ -60,11 +60,19 @@ docker compose up -d
 - **[docs/CONVERSATIONS.md](docs/CONVERSATIONS.md)** — organize, separate, delete, and truly purge chats + memory
 - **[docs/HARDWARE.md](docs/HARDWARE.md)** — honest speed expectations + upgrade path
 
-## Set your own rules
+## Set your own rules — and Joe's personality
 
-Edit `guardrails/system-prompt.txt` — it has `ALWAYS ALLOWED`, `ASK FIRST`, and
-`OFF LIMITS` sections. Leave `OFF LIMITS` empty for an unrestricted assistant or
-fill it in. Then rerun `.\scripts\build-guarded-model.ps1` and restart the chat.
+Two files, both yours, both baked into the model at build time:
+
+- **`guardrails/system-prompt.txt`** — the hard RULES: `ALWAYS ALLOWED`,
+  `ASK FIRST`, `OFF LIMITS`, plus privacy / plan-first / permission rules.
+- **`guardrails/personality.txt`** — HOW Joe acts: tone, humor, verbosity,
+  quirks. Personality colors delivery but can never override a rule. (Ships with
+  a running "who is Joe → Joe Mama" bit as the first entry — edit or keep it.)
+
+Edit either, then rerun `.\scripts\build-guarded-model.ps1` and restart the
+chat. Rule changes prompt you to confirm (self-edit guard); personality tweaks
+apply freely.
 
 ## Gotchas (the ones that bite everyone)
 

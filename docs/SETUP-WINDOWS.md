@@ -73,9 +73,9 @@ ollama pull nomic-embed-text
 .\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name joe
 ```
 
-Edit `guardrails\system-prompt.txt` any time and rerun that last command to
-change the rules. See `guardrails\policy.md` for how the guardrails actually
-work.
+Edit `guardrails\system-prompt.txt` (the rules) or `guardrails\personality.txt`
+(how Joe talks/acts) any time and rerun that last command to apply the changes.
+See `guardrails\policy.md` for how the guardrails actually work.
 
 ## Step 4 — Set the SearXNG secret
 

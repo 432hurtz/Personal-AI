@@ -19,6 +19,7 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $promptPath = Join-Path $root "guardrails\system-prompt.txt"
+$personaPath = Join-Path $root "guardrails\personality.txt"
 $hashPath   = Join-Path $root "guardrails\.last-build-hash"
 $modelfile  = Join-Path $env:TEMP "Modelfile.joe"
 
@@ -52,12 +53,21 @@ ollama pull $Base
 
 $system = Get-Content $promptPath -Raw
 
+# Personality (owner-defined tone/behavior) is appended AFTER the rules, so it
+# colors delivery but can't override a safety/privacy rule. Optional file.
+$persona = ""
+if (Test-Path $personaPath) {
+  $persona = "`n`n" + (Get-Content $personaPath -Raw)
+} else {
+  Write-Host "(no guardrails\personality.txt found -- building with rules only)"
+}
+
 @"
 FROM $Base
 PARAMETER num_ctx $NumCtx
 PARAMETER temperature $Temperature
 SYSTEM """
-$system
+$system$persona
 """
 "@ | Set-Content -Path $modelfile -Encoding UTF8
 
@@ -70,4 +80,6 @@ $currentHash | Set-Content -Path $hashPath -Encoding ASCII
 
 Write-Host ""
 Write-Host "Done. Your guarded model is '$Name'." -ForegroundColor Green
-Write-Host "Edit guardrails\system-prompt.txt and rerun this script to change the rules."
+Write-Host "Rules:       guardrails\system-prompt.txt"
+Write-Host "Personality: guardrails\personality.txt"
+Write-Host "Edit either and rerun this script to apply the changes."

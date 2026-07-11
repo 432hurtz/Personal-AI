@@ -14,6 +14,7 @@ TEMPERATURE="${TEMPERATURE:-0.4}"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROMPT="$ROOT/guardrails/system-prompt.txt"
+PERSONA="$ROOT/guardrails/personality.txt"
 HASHFILE="$ROOT/guardrails/.last-build-hash"
 MODELFILE="$(mktemp)"
 trap 'rm -f "$MODELFILE"' EXIT
@@ -44,12 +45,20 @@ fi
 echo "Pulling base model '$BASE' (skip if already present)..."
 ollama pull "$BASE"
 
+# Personality (owner-defined tone/behavior) is appended AFTER the rules, so it
+# colors delivery but can't override a safety/privacy rule. Optional file.
 {
   echo "FROM $BASE"
   echo "PARAMETER num_ctx $NUM_CTX"
   echo "PARAMETER temperature $TEMPERATURE"
   echo 'SYSTEM """'
   cat "$PROMPT"
+  if [ -f "$PERSONA" ]; then
+    echo
+    cat "$PERSONA"
+  else
+    echo "(no guardrails/personality.txt found -- building with rules only)" >&2
+  fi
   echo '"""'
 } > "$MODELFILE"
 
@@ -61,4 +70,6 @@ printf '%s' "$CURRENT_HASH" > "$HASHFILE"
 
 echo
 echo "Done. Your guarded model is '$NAME'."
-echo "Edit guardrails/system-prompt.txt and rerun this script to change the rules."
+echo "Rules:       guardrails/system-prompt.txt"
+echo "Personality: guardrails/personality.txt"
+echo "Edit either and rerun this script to apply the changes."
