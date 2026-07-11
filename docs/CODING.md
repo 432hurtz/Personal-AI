@@ -76,3 +76,29 @@ $env:OPENAI_API_KEY  = "ollama"
   Aider / open the editor in exactly the folder you want reachable.
 - Keep destructive git operations behind the "ASK FIRST" rule — Aider won't
   push for you, but you can wire commits carefully.
+
+## Working on Joe's own code
+
+Joe can edit **its own** project too — just point the tool at the JI folder:
+
+```powershell
+cd C:\JI                      # the JI Project itself
+aider --model ollama/joe      # Joe can now read + edit its own files
+```
+
+It can rewrite anything here, including `guardrails/system-prompt.txt` — its own
+rules. There's an important safety property built in:
+
+- **Editing the rules file does nothing to the running Joe until you rebuild.**
+  `guardrails/system-prompt.txt` only takes effect when you run
+  `scripts\build-guarded-model.ps1` and reselect the model. So Joe can *propose*
+  changes to its own guardrails, but it can't make them live — that's your step.
+- **The build script now flags self-edits.** If the guardrails changed since the
+  last build, the script stops and makes you confirm before rebuilding (it
+  compares a hash stored in `guardrails/.last-build-hash`). A quietly loosened
+  rule can't slip into a rebuild unreviewed. Use `-Force` to skip the prompt
+  only when you know what changed.
+
+If you want Joe to not just edit code but also run commands / manage files on the
+machine, see **[AGENT-CONTROL.md](AGENT-CONTROL.md)** — that's the
+permission-gated system-control setup.

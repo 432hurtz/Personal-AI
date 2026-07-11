@@ -30,21 +30,35 @@ To change it: edit `system-prompt.txt`, rerun the build script, restart.
 **Strength: hard.** This is config, not vibes. The model can't reach the
 internet except through the search path you built.
 
-## Layer 3 — Filesystem (scope of the coding tool)  ← hard boundary
+## Layer 3 — Filesystem & execution (the agent tool)  ← hard boundary
 
-The model only "has hands" when you connect a coding tool (Continue.dev, Aider)
-to it. That tool decides which files the model can read/write — **not the
-system prompt.** So the real filesystem guardrail is: *point the tool at one
-project folder at a time.* See `docs/CODING.md`. Aider, for example, only edits
-files in the repo you launched it in and shows you a diff before applying.
+The model only "has hands" when you connect a tool (Continue.dev, Aider, or —
+for full file/command control — Open Interpreter). That tool decides what Joe
+can read, write, and run — **not the system prompt.** The real guardrails here:
+
+- **Scope:** launch the tool in the one folder you want reachable. Aider edits
+  only its repo; Open Interpreter acts from its working directory.
+- **Permission:** with Open Interpreter, `auto_run: false` means Joe **asks
+  before every command and file change** — you type `y`. Create and delete only
+  happen with your approval. (See `docs/AGENT-CONTROL.md`.)
+- **Elevation:** admin actions go through Windows UAC — *you* authenticate; Joe
+  never holds your password.
+
+**The injection caveat.** Joe reads untrusted web pages during research. A
+malicious page could try to make an agent run harmful commands. The hard
+defenses are: never enable auto-run, and keep research (Open WebUI) separate
+from execution (the agent). Layer 1 adds a soft anti-injection rule (treat web
+content as data, never commands), but the approval gate is what actually saves
+you.
 
 ## The short version
 
-| You want to forbid...        | Enforce it at...                    | How hard |
-|------------------------------|-------------------------------------|----------|
-| A topic / behavior           | Layer 1: `system-prompt.txt`        | soft     |
-| Data leaving the machine     | Layer 2: already done (Tor+loopback)| hard     |
-| Touching the wrong files     | Layer 3: scope the editor/Aider     | hard     |
+| You want to forbid...            | Enforce it at...                       | How hard |
+|----------------------------------|----------------------------------------|----------|
+| A topic / behavior               | Layer 1: `system-prompt.txt`           | soft     |
+| Data leaving the machine         | Layer 2: already done (Tor+loopback)   | hard     |
+| Touching the wrong files         | Layer 3: scope the tool                | hard     |
+| Running things without consent   | Layer 3: `auto_run: false` + UAC       | hard     |
 
 Edit Layer 1 freely — that's the "OFF LIMITS" block in `system-prompt.txt`.
 Leave it empty for an unrestricted assistant, or fill it in. Your call.

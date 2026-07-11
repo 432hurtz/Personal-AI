@@ -12,16 +12,39 @@ param(
   [string]$Base = "qwen2.5-coder:7b",   # base model to wrap
   [string]$Name = "joe",        # name of your guarded model
   [int]$NumCtx  = 4096,                 # context window (keep modest on CPU)
-  [double]$Temperature = 0.4            # lower = more deterministic
+  [double]$Temperature = 0.4,           # lower = more deterministic
+  [switch]$Force                        # skip the "rules changed" confirmation
 )
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $promptPath = Join-Path $root "guardrails\system-prompt.txt"
+$hashPath   = Join-Path $root "guardrails\.last-build-hash"
 $modelfile  = Join-Path $env:TEMP "Modelfile.joe"
 
 if (-not (Test-Path $promptPath)) {
   throw "Can't find $promptPath"
+}
+
+# Guard: if the guardrails changed since the last build, make the human notice.
+# A self-edit (Joe rewriting its own rules) can never slip into a rebuild
+# unreviewed -- you have to confirm.
+$currentHash = (Get-FileHash $promptPath -Algorithm SHA256).Hash
+if (Test-Path $hashPath) {
+  $prevHash = (Get-Content $hashPath -Raw).Trim()
+  if ($prevHash -ne $currentHash) {
+    Write-Host ""
+    Write-Host "NOTICE: guardrails\system-prompt.txt has CHANGED since the last build." -ForegroundColor Yellow
+    Write-Host "Review it (especially OFF LIMITS and SYSTEM & FILE CONTROL) before rebuilding."
+    if (-not $Force) {
+      $ans = Read-Host "Rebuild Joe with these changed rules? (y/N)"
+      if ($ans -ne 'y') { Write-Host "Aborted. Nothing was rebuilt."; exit 1 }
+    }
+  } else {
+    Write-Host "Guardrails unchanged since last build."
+  }
+} else {
+  Write-Host "First build (no previous guardrails hash on record)."
 }
 
 Write-Host "Pulling base model '$Base' (skip if already present)..."
@@ -41,6 +64,9 @@ $system
 Write-Host "Building guarded model '$Name' from '$Base'..."
 ollama create $Name -f $modelfile
 Remove-Item $modelfile -ErrorAction SilentlyContinue
+
+# Record the hash we just built from, so the next run can detect changes.
+$currentHash | Set-Content -Path $hashPath -Encoding ASCII
 
 Write-Host ""
 Write-Host "Done. Your guarded model is '$Name'." -ForegroundColor Green

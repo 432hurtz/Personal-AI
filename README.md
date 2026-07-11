@@ -20,6 +20,7 @@ Windows 10. It's portable to anything better later.
 | **Absolute privacy** | native Ollama + loopback + telemetry off (`docker-compose.yml`) | hard |
 | **Research through Tor** | `searxng/settings.yml` (`socks5h://tor:9050`), incl. `.onion` via Ahmia + Torch; optional obfs4 **bridges** to hide Tor use from your ISP | hard |
 | **Coding on this machine** | native Ollama at `localhost:11434` (`docs/CODING.md`) | — |
+| **File & system control** | Open Interpreter agent, permission-gated (`docs/AGENT-CONTROL.md`) | your approval per action |
 
 Read `guardrails/policy.md` — it explains that guardrails work in **3 layers**
 (behavioral, network, filesystem) and which ones are hard vs. soft. That's the
@@ -54,7 +55,8 @@ docker compose up -d
 - **[guardrails/policy.md](guardrails/policy.md)** — how the guardrails actually enforce
 - **[docs/PRIVACY.md](docs/PRIVACY.md)** — what "absolute privacy" does and doesn't mean, incl. what your ISP/websites can see
 - **[docs/REMOTE-ACCESS.md](docs/REMOTE-ACCESS.md)** — SSH from your phone (LAN or Tailscale), no open ports
-- **[docs/CODING.md](docs/CODING.md)** — connect VS Code / Aider to local Ollama
+- **[docs/CODING.md](docs/CODING.md)** — connect VS Code / Aider to local Ollama; let Joe edit its own code
+- **[docs/AGENT-CONTROL.md](docs/AGENT-CONTROL.md)** — give Joe permission-gated control of files + system
 - **[docs/HARDWARE.md](docs/HARDWARE.md)** — honest speed expectations + upgrade path
 
 ## Set your own rules

@@ -13,6 +13,9 @@
 # Your real Tor bridge lines stay private; keep only the example
 /tor/bridges.conf
 
+# Local build marker (per-machine record of the last guardrails build)
+/guardrails/.last-build-hash
+
 # OS / editor noise
 .DS_Store
 Thumbs.db
