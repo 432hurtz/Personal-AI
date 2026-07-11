@@ -66,6 +66,9 @@ cd <path-to>\Personal-AI
 ollama pull gemma3:4b
 ollama pull qwen2.5-coder:3b
 
+# Local embeddings for web-search RAG -- keeps everything offline (small, fast)
+ollama pull nomic-embed-text
+
 # Wrap the coder with YOUR guardrails -> creates model "personal-ai"
 .\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name personal-ai
 ```

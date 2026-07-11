@@ -63,6 +63,10 @@ services:
       - https_proxy=http://tor:8118
       - NO_PROXY=localhost,127.0.0.1,host.docker.internal,searxng,ollama,.local
       - no_proxy=localhost,127.0.0.1,host.docker.internal,searxng,ollama,.local
+      # Embeddings for RAG run LOCALLY on Ollama -- nothing is downloaded from
+      # HuggingFace, nothing leaves the machine. Requires: ollama pull nomic-embed-text
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_EMBEDDING_MODEL=nomic-embed-text
       # Web search via our Tor-routed SearXNG
       - ENABLE_RAG_WEB_SEARCH=true
       - RAG_WEB_SEARCH_ENGINE=searxng

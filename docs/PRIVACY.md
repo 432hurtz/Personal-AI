@@ -68,12 +68,12 @@ That's the cost of not leaking your IP. To turn it off, delete the four
 `*_PROXY` / `*_proxy` lines from `docker-compose.yml` and `docker compose up -d`
 again — search stays on Tor, only the page fetch goes direct.
 
-**One first-run note:** the first time you use RAG, Open WebUI downloads a small
-embedding model. With the proxy on, that download goes over Tor (slow but
-private). If it stalls, either wait it out once, or switch embeddings to your
-local Ollama so nothing is downloaded at all: set
-`RAG_EMBEDDING_ENGINE=ollama` and `RAG_EMBEDDING_MODEL=nomic-embed-text` in the
-compose file and `ollama pull nomic-embed-text`.
+**Embeddings are fully local.** Open WebUI would normally download an embedding
+model from HuggingFace the first time you use RAG. This setup avoids that
+entirely: `RAG_EMBEDDING_ENGINE=ollama` + `RAG_EMBEDDING_MODEL=nomic-embed-text`
+make embeddings run on your local Ollama, so nothing is downloaded at RAG time
+and nothing leaves the machine. You just pull `nomic-embed-text` once during
+setup (it's small and fast, even on your CPU).
 
 ## Onion (dark web) search
 
