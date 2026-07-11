@@ -1,0 +1,13 @@
+# Copy this file to  tor/bridges.conf  and paste your own bridge lines below.
+#
+# Get bridges (pick obfs4) from any of:
+#   - https://bridges.torproject.org/  (choose "obfs4")
+#   - Email bridges@torproject.org from Gmail/Riseup with body: get transport obfs4
+#   - Telegram: @GetBridgesBot
+#
+# Each line looks like this (these are EXAMPLES — they will not work, get real ones):
+#
+# Bridge obfs4 192.0.2.10:443 0123456789ABCDEF0123456789ABCDEF01234567 cert=aBcDeF...xyz iat-mode=0
+# Bridge obfs4 198.51.100.7:9001 89ABCDEF0123456789ABCDEF0123456789ABCDEF cert=gHiJkL...uvw iat-mode=0
+#
+# 2-3 bridges is plenty. Keep the real file private (it's gitignored).

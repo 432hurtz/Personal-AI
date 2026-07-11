@@ -17,7 +17,7 @@ portable to anything better later.
 |---|---|---|
 | **You decide what's off limits** | `guardrails/system-prompt.txt` (you edit) | behavioral / soft |
 | **Absolute privacy** | native Ollama + loopback + telemetry off (`docker-compose.yml`) | hard |
-| **Research through Tor** | `searxng/settings.yml` (`socks5h://tor:9050`), incl. `.onion` via Ahmia + Torch | hard |
+| **Research through Tor** | `searxng/settings.yml` (`socks5h://tor:9050`), incl. `.onion` via Ahmia + Torch; optional obfs4 **bridges** to hide Tor use from your ISP | hard |
 | **Coding on this machine** | native Ollama at `localhost:11434` (`docs/CODING.md`) | — |
 
 Read `guardrails/policy.md` — it explains that guardrails work in **3 layers**

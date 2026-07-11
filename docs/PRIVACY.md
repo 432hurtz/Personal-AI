@@ -40,11 +40,11 @@ local Q&A with the globe toggle OFF, nothing leaves the machine at all.
 You said you hate ISP and website tracking, so here's the exact accounting.
 
 **Your ISP sees:**
-- That you connect to the **Tor network** (the entry/guard node). It sees you
-  *use* Tor — not what you search, not which sites you read, not the content.
-  This is unavoidable with Tor and is the price of hiding everything else. (If
-  even "uses Tor" is too much for your threat model, a Tor bridge hides that
-  too — out of scope here, ask if you want it.)
+- By default, that you connect to the **Tor network** (the entry/guard node).
+  It sees you *use* Tor — not what you search, not which sites you read, not the
+  content. **If you don't want your ISP to see even that, turn on bridges**
+  (next section): with obfs4 bridges the connection is obfuscated and doesn't
+  look like Tor.
 - A few **one-time clearnet downloads** during setup: Docker pulling the
   container images, and Ollama pulling models from `ollama.com`. These are not
   routed through Tor (doing so is slow and fragile). Your ISP sees you
@@ -93,6 +93,40 @@ Caveats: onion indexes are sparse and stale (expect dead links), onion
 addresses rot (if Torch returns nothing, its `.onion` address in `settings.yml`
 likely needs updating), and the dark web hosts plenty you may want off this
 machine — that's what the `OFF LIMITS` block in your guardrails is for.
+
+## Hide Tor from your ISP (obfs4 bridges) — optional
+
+By default your ISP can see you connect to Tor (not what you do — just that Tor
+is in use). To hide *that* too, route through **obfs4 bridges**: unlisted entry
+points that scramble the traffic so it doesn't look like Tor to your ISP's deep
+packet inspection.
+
+This is opt-in via a separate Tor container (`tor/`) and a compose override, so
+your normal setup stays simple. To enable:
+
+```powershell
+# 1. Get 2-3 obfs4 bridge lines from https://bridges.torproject.org (pick obfs4),
+#    or Telegram @GetBridgesBot, or email bridges@torproject.org ("get transport obfs4").
+# 2. Create your private bridges file and paste them in:
+copy tor\bridges.conf.example tor\bridges.conf
+notepad tor\bridges.conf
+# 3. Bring the stack up WITH the bridge override (note the --build):
+docker compose -f docker-compose.yml -f docker-compose.bridges.yml up -d --build
+```
+
+The bridge container exposes the same `tor:9050` (SOCKS) and `tor:8118` (HTTP)
+the rest of the stack already uses, so nothing else changes — SearXNG, the RAG
+page fetch, and onion search all now flow through bridges.
+
+Notes:
+- Bridges are slower and take longer to bootstrap. Give it a minute, then run
+  `.\scripts\verify-tor.ps1` — you still expect `IsTor:true`.
+- Check it connected: `docker compose logs -f tor` and look for
+  `Bootstrapped 100% (done)`. If it stalls at a low %, your bridges are likely
+  dead — grab fresh ones and rebuild.
+- `tor/bridges.conf` is gitignored so your bridge lines stay private.
+- To go back to plain Tor, just omit the `-f docker-compose.bridges.yml` part
+  and `docker compose up -d` normally.
 
 ## Hardening checklist (optional, all local)
 

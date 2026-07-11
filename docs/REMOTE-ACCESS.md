@@ -3,12 +3,24 @@
 Goal: reach the laptop from your phone to run `ollama`, check the stack, or open
 the web UI — without exposing anything to the public internet.
 
-Two situations:
-- **Same Wi-Fi** (you're home): plain LAN SSH. Most private, nothing leaves the
-  network.
-- **Anywhere** (you're out): use **Tailscale** (a private WireGuard mesh). Do
-  **not** port-forward SSH to the internet — that's the tracking/attack surface
-  you're trying to avoid.
+## Start here — which option do I want?
+
+| Situation | Use | What to read |
+|---|---|---|
+| I'm on the **same Wi-Fi** as the laptop | Plain LAN SSH | Parts 1–5 |
+| I want to reach it **from anywhere** (mobile data, other Wi-Fi) | Tailscale | Parts 1–3, then Part 6 |
+
+Either way you do the **one-time setup in Parts 1–3 first** (turn on SSH, add
+your phone's key, lock it down). After that, connecting is a single command.
+
+**The 30-second version**, once setup is done:
+```
+# shell in (home Wi-Fi):            ssh you@192.168.1.42
+# shell in (anywhere, Tailscale):   ssh you@100.x.y.z
+# get the web UI on your phone too:  add  -L 3000:localhost:3000  then open http://localhost:3000
+```
+Throughout this doc, replace **`you`** with your Windows username and the **IP**
+with your laptop's actual address (Part 1 shows how to find it).
 
 ---
 
@@ -38,8 +50,16 @@ ipconfig | Select-String IPv4      # e.g. 192.168.1.42
 
 Password SSH is guessable and a tracking/attack surface. Use a key.
 
-**On your phone**, in your SSH app (see Part 4), generate an ed25519 key and
-copy its **public** key.
+**On your phone first**, make a key and grab its *public* half. Concretely, in
+**Termius** (free, iPhone + Android):
+
+1. Install Termius → tab **Keychain** → **+** → **Generate Key**.
+2. Type **ED25519**, give it a name, **Generate**.
+3. Open that key → **Copy Public Key**. That's the string (starts with
+   `ssh-ed25519 AAAA...`) you paste on the laptop below.
+
+(JuiceSSH/Blink/Termux are similar; in Termux it's `ssh-keygen -t ed25519` then
+`cat ~/.ssh/id_ed25519.pub`.)
 
 **On the laptop**, because your Windows account is almost certainly an admin,
 the key must go in the *administrators* file with tight permissions (this trips
@@ -77,7 +97,7 @@ Tailscale range can reach port 22 — never the whole internet:
 
 ```powershell
 # Example: allow only your home subnet. Adjust to your actual subnet
-# (and add Tailscale's 100.64.0.0/10 if you use it, see Part 5).
+# (and add Tailscale's 100.64.0.0/10 if you use it, see Part 6).
 Set-NetFirewallRule -Name "OpenSSH-Server-In-TCP" `
   -RemoteAddress 192.168.1.0/24,100.64.0.0/10
 ```
@@ -86,33 +106,41 @@ Set-NetFirewallRule -Name "OpenSSH-Server-In-TCP" `
 
 ## Part 4 — Connect from the phone (same Wi-Fi)
 
-Good SSH apps:
-- **iPhone:** Termius or Blink Shell.
-- **Android:** Termius or JuiceSSH; or Termux (`pkg install openssh`).
+In **Termius**: tab **Hosts** → **+** → **New Host**:
+- **Address:** your laptop's LAN IP (e.g. `192.168.1.42`)
+- **Username:** your Windows username
+- **Key:** pick the ED25519 key you made in Part 2
+- Leave port `22`.
 
-Connect:
+Tap the host to connect. You're in — try `ollama list`,
+`ollama run personal-ai`, `docker compose ps`.
 
+Prefer typing it? From a terminal app (Termux, Blink):
 ```
-ssh <your-windows-username>@192.168.1.42
+ssh you@192.168.1.42        # replace "you" and the IP with yours
 ```
 
-You're in. `ollama list`, `ollama run personal-ai`, `docker compose ps`, etc.
-
-## Part 5 — Reach the Open WebUI from your phone (the private way)
+## Part 5 — Get the Open WebUI on your phone (the private way)
 
 The web UI is bound to `127.0.0.1:3000` on purpose — it's **not** reachable over
 the LAN, and you should keep it that way (the Ollama API behind it has no auth).
-To use it from the phone, tunnel it through your SSH connection so it stays
-loopback-only:
+To use it from the phone, **tunnel** it through your SSH connection so it stays
+loopback-only.
 
-```
-ssh -L 3000:localhost:3000 <your-windows-username>@192.168.1.42
-```
+**In Termius** (easiest — set it once): open your host → **Port Forwarding** →
+**+** → type **Local**:
+- **Bind/Local port:** `3000`
+- **Destination host:** `localhost`   **Destination port:** `3000`
 
-Then open **`http://localhost:3000` in the phone's browser** while that SSH
-session is up. The traffic rides the encrypted SSH tunnel; nothing is exposed.
-Termius and Blink both have a "port forwarding" field so you don't have to type
-the flag each time.
+Start that forward, then open **`http://localhost:3000` in your phone's
+browser**. That's it — the traffic rides the encrypted SSH tunnel; nothing is
+exposed to the network.
+
+**Typing it instead?** The `-L` flag does the same thing:
+```
+ssh -L 3000:localhost:3000 you@192.168.1.42
+```
+Keep that session open and browse to `http://localhost:3000` on the phone.
 
 ## Part 6 — Access from anywhere (Tailscale)
 
