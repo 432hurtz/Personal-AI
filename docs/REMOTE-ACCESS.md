@@ -113,7 +113,7 @@ In **Termius**: tab **Hosts** → **+** → **New Host**:
 - Leave port `22`.
 
 Tap the host to connect. You're in — try `ollama list`,
-`ollama run personal-ai`, `docker compose ps`.
+`ollama run joe`, `docker compose ps`.
 
 Prefer typing it? From a terminal app (Termux, Blink):
 ```

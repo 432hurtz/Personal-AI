@@ -1,4 +1,4 @@
-# Personal-AI stack — Open WebUI + SearXNG + Tor
+# The JI Project stack — Open WebUI + SearXNG + Tor (Joe runs on Ollama)
 #
 # Ollama is NOT in this file on purpose. On your Windows laptop you'll run
 # Ollama NATIVELY (see docs/SETUP-WINDOWS.md) for best CPU speed and so your

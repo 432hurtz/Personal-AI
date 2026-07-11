@@ -18,9 +18,9 @@ Best for inline chat + autocomplete inside the editor.
 {
   "models": [
     {
-      "title": "personal-ai (guarded)",
+      "title": "joe (guarded)",
       "provider": "ollama",
-      "model": "personal-ai"
+      "model": "joe"
     },
     {
       "title": "qwen coder 3b",
@@ -53,7 +53,7 @@ that's your filesystem guardrail.
 ```powershell
 pip install aider-install; aider-install     # or: pipx install aider-chat
 cd C:\path\to\your\project                    # scope = this folder only
-aider --model ollama/personal-ai
+aider --model ollama/joe
 ```
 
 Point `--model` at your guarded model to carry your system-prompt rules into
@@ -70,7 +70,7 @@ $env:OPENAI_API_KEY  = "ollama"
 
 ## Guardrails while coding
 
-- Your `system-prompt.txt` rules ride along **only if you use the `personal-ai`
+- Your `system-prompt.txt` rules ride along **only if you use the `joe`
   model.** If you point a tool at a raw base model, you get no behavioral rules.
 - The hard filesystem boundary is the tool's scope, not the prompt. Launch
   Aider / open the editor in exactly the folder you want reachable.

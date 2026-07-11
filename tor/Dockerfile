@@ -1,4 +1,4 @@
-# Bridge-capable Tor proxy for Personal-AI.
+# Bridge-capable Tor proxy for The JI Project.
 #
 # Same interface as the default dperson/torproxy service so the rest of the
 # stack doesn't change:

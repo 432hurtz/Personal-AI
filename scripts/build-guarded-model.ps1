@@ -3,14 +3,14 @@
 #
 # Usage (PowerShell, from the repo root):
 #   .\scripts\build-guarded-model.ps1                       # uses defaults
-#   .\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name personal-ai
+#   .\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name joe
 #
-# After it runs, use the model named 'personal-ai' in Open WebUI or the CLI:
-#   ollama run personal-ai
+# After it runs, use the model named 'joe' in Open WebUI or the CLI:
+#   ollama run joe
 
 param(
   [string]$Base = "qwen2.5-coder:7b",   # base model to wrap
-  [string]$Name = "personal-ai",        # name of your guarded model
+  [string]$Name = "joe",        # name of your guarded model
   [int]$NumCtx  = 4096,                 # context window (keep modest on CPU)
   [double]$Temperature = 0.4            # lower = more deterministic
 )
@@ -18,7 +18,7 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $promptPath = Join-Path $root "guardrails\system-prompt.txt"
-$modelfile  = Join-Path $env:TEMP "Modelfile.personal-ai"
+$modelfile  = Join-Path $env:TEMP "Modelfile.joe"
 
 if (-not (Test-Path $promptPath)) {
   throw "Can't find $promptPath"

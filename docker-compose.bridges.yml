@@ -10,7 +10,7 @@
 # the same tor:9050 (SOCKS) and tor:8118 (HTTP) that the rest of the stack uses.
 services:
   tor:
-    image: personal-ai-tor:bridges
+    image: ji-tor:bridges
     build: ./tor
     volumes:
       - ./tor/bridges.conf:/etc/tor/bridges.conf:ro

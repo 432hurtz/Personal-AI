@@ -1,15 +1,16 @@
-# Personal-AI
+# The JI Project
 
-A fully local, private research + coding assistant that **you** set the rules
-for. Built to run on a modest Windows laptop.
+**Joe** — a fully local, private research + coding assistant that **you** set
+the rules for. Built to run on a modest Windows laptop.
 
-- **Ollama** (native, CPU) runs the model — nothing leaves your machine.
+- **Ollama** (native, CPU) runs Joe — nothing leaves your machine.
 - **Open WebUI** is the chat face, bound to loopback only, telemetry off.
 - **SearXNG** does web research; every query goes out over **Tor**.
 - **You** own the guardrails — one editable file decides what's off limits.
 
-Built for: HP 14-fq0xxx, Athlon Silver 3050U, 18 GB RAM, Windows 10. It's
-portable to anything better later.
+"Joe" is the assistant (the model you talk to). "The JI Project" is the whole
+stack around it. Built for: HP 14-fq0xxx, Athlon Silver 3050U, 18 GB RAM,
+Windows 10. It's portable to anything better later.
 
 ## The four things you asked for, and where each lives
 
@@ -30,10 +31,11 @@ Full walkthrough: **[docs/SETUP-WINDOWS.md](docs/SETUP-WINDOWS.md)**. Short form
 
 ```powershell
 # 1. Install Docker Desktop (WSL2 backend) and native Ollama.
-# 2. Pull models + build your guarded model:
+# 2. Pull models + build Joe (your guarded model):
 ollama pull gemma3:4b
 ollama pull qwen2.5-coder:3b
-.\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name personal-ai
+ollama pull nomic-embed-text
+.\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name joe
 
 # 3. Put a real secret in searxng\settings.yml (secret_key line):
 -join ((1..32) | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })
@@ -42,7 +44,7 @@ ollama pull qwen2.5-coder:3b
 docker compose up -d
 .\scripts\verify-tor.ps1        # expect IsTor:true
 
-# 5. Open http://localhost:3000, pick the "personal-ai" model, toggle the
+# 5. Open http://localhost:3000, pick the "joe" model, toggle the
 #    globe icon to research over Tor.
 ```
 

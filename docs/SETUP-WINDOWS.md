@@ -1,4 +1,4 @@
-# Setup — Windows 10 (your HP 14-fq0xxx)
+# The JI Project — Setup on Windows 10 (your HP 14-fq0xxx)
 
 This is written for **your** machine: Windows 10 Pro, AMD Athlon Silver 3050U
 (2 cores / 2 threads), 18 GB RAM, integrated Radeon 2 GB, ~779 GB free.
@@ -60,7 +60,7 @@ the CPU is what makes it slow. Keep `num_ctx` at 4096.
 ## Step 3 — Pull models and build your guarded model
 
 ```powershell
-cd <path-to>\Personal-AI
+cd <path-to>\personal-ai
 
 # Pull a daily driver and a coder
 ollama pull gemma3:4b
@@ -69,8 +69,8 @@ ollama pull qwen2.5-coder:3b
 # Local embeddings for web-search RAG -- keeps everything offline (small, fast)
 ollama pull nomic-embed-text
 
-# Wrap the coder with YOUR guardrails -> creates model "personal-ai"
-.\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name personal-ai
+# Wrap the coder with YOUR guardrails -> creates model "joe"
+.\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name joe
 ```
 
 Edit `guardrails\system-prompt.txt` any time and rerun that last command to
@@ -111,7 +111,7 @@ Give Tor a minute to bootstrap, then verify egress really goes through Tor:
 4. Set **Search Result Count = 3** and **Concurrent Requests = 2**. On your CPU,
    RAG over 5+ raw HTML pages is what stalls the model — this matters more than
    it looks.
-5. Pick the model `personal-ai` (your guarded one) in the chat model dropdown.
+5. Pick the model `joe` (your guarded one) in the chat model dropdown.
 
 Toggle the **globe icon** in a chat to run a Tor-routed research query.
 
