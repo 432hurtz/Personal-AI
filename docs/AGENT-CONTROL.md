@@ -29,6 +29,40 @@ rule is *soft* (Layer 1) — the hard protection is #1 and #2 above.
 
 ---
 
+## How it works: plan → you approve → it acts
+
+Nothing happens to your machine before you've seen and approved a plan. Every
+time Joe is about to change files, run commands, or edit its own code, it must
+first stop and show you a **detailed plan**:
+
+1. **Goal** — what it's trying to do.
+2. **Steps** — each action in order: for files, the exact operation
+   (create / edit / delete / move) and the full path; for commands, the exact
+   command text.
+3. **Sources** — what it's drawing from: which files it read, which web results
+   or pages, which docs.
+4. **Effect** — what changes, what gets destroyed, and whether it's reversible.
+
+You approve the plan before it begins — and you still get a `y/N` at each
+destructive step (delete/overwrite). If reality diverges from the plan (a path
+is different, a step fails), Joe re-presents the plan instead of improvising.
+Approve part of it and it does only that part. This is baked into Joe's rules
+(`guardrails/system-prompt.txt`, "PLAN FIRST") and enforced at run time by the
+approval prompts below. It applies equally to Joe editing **its own code**.
+
+A plan looks like:
+
+```
+GOAL: Clean up build artifacts in this project.
+STEPS:
+  1. DELETE  C:\JI\open-webui\cache\  (folder, ~40 files)
+  2. EDIT    C:\JI\.gitignore  (add a line)
+SOURCES: read C:\JI\.gitignore; no web sources.
+EFFECT: step 1 permanently removes cached files (not reversible); step 2 is a
+        one-line edit (reversible via git).
+Approve? [y/N]
+```
+
 ## Install (one time)
 
 In PowerShell:

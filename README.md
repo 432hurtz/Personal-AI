@@ -20,7 +20,7 @@ Windows 10. It's portable to anything better later.
 | **Absolute privacy** | native Ollama + loopback + telemetry off (`docker-compose.yml`) | hard |
 | **Research through Tor** | `searxng/settings.yml` (`socks5h://tor:9050`), incl. `.onion` via Ahmia + Torch; optional obfs4 **bridges** to hide Tor use from your ISP | hard |
 | **Coding on this machine** | native Ollama at `localhost:11434` (`docs/CODING.md`) | — |
-| **File & system control** | Open Interpreter agent, permission-gated (`docs/AGENT-CONTROL.md`) | your approval per action |
+| **File & system control** | Open Interpreter agent — Joe shows a detailed plan (steps, sources, effect) and you approve everything before it acts (`docs/AGENT-CONTROL.md`) | your approval per action |
 
 Read `guardrails/policy.md` — it explains that guardrails work in **3 layers**
 (behavioral, network, filesystem) and which ones are hard vs. soft. That's the

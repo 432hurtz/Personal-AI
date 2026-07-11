@@ -87,7 +87,13 @@ aider --model ollama/joe      # Joe can now read + edit its own files
 ```
 
 It can rewrite anything here, including `guardrails/system-prompt.txt` — its own
-rules. There's an important safety property built in:
+rules. But the same **plan-first, you-approve-everything** flow applies: before
+touching any file, Joe presents a detailed plan (goal, exact edits with paths,
+what it's drawing from, and the effect) and waits for your approval — see
+[AGENT-CONTROL.md](AGENT-CONTROL.md). Editing its own code is not special-cased;
+it goes through the same gate.
+
+There are also two safety properties built in:
 
 - **Editing the rules file does nothing to the running Joe until you rebuild.**
   `guardrails/system-prompt.txt` only takes effect when you run

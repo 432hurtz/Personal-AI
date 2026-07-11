@@ -38,9 +38,13 @@ can read, write, and run — **not the system prompt.** The real guardrails here
 
 - **Scope:** launch the tool in the one folder you want reachable. Aider edits
   only its repo; Open Interpreter acts from its working directory.
+- **Plan first:** before acting, Joe presents a detailed plan — goal, each step
+  with full paths / exact commands, what it's drawing from, and the effect — and
+  waits for you to approve it. This covers editing files *and* editing its own
+  code. (See `docs/AGENT-CONTROL.md`.)
 - **Permission:** with Open Interpreter, `auto_run: false` means Joe **asks
   before every command and file change** — you type `y`. Create and delete only
-  happen with your approval. (See `docs/AGENT-CONTROL.md`.)
+  happen with your approval.
 - **Elevation:** admin actions go through Windows UAC — *you* authenticate; Joe
   never holds your password.
 
