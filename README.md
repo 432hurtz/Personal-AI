@@ -32,11 +32,9 @@ Full walkthrough: **[docs/SETUP-WINDOWS.md](docs/SETUP-WINDOWS.md)**. Short form
 
 ```powershell
 # 1. Install Docker Desktop (WSL2 backend) and native Ollama.
-# 2. Pull models + build Joe (your guarded model):
-ollama pull gemma3:4b
-ollama pull qwen2.5-coder:3b
-ollama pull nomic-embed-text
-.\scripts\build-guarded-model.ps1 -Base qwen2.5-coder:3b -Name joe
+# 2. Build your Joes (fast 'joe' + smart 'joe-7b') with guardrails + personality:
+ollama pull nomic-embed-text          # local RAG embeddings
+.\scripts\build-joes.ps1              # pulls the 3B + 7B and builds both
 
 # 3. Put a real secret in searxng\settings.yml (secret_key line):
 -join ((1..32) | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })
@@ -45,8 +43,9 @@ ollama pull nomic-embed-text
 docker compose up -d
 .\scripts\verify-tor.ps1        # expect IsTor:true
 
-# 5. Open http://localhost:3000, pick the "joe" model, toggle the
-#    globe icon to research over Tor.
+# 5. Open http://localhost:3000. Use the model dropdown (top-left of the chat)
+#    to switch between "joe" (fast) and "joe-7b" (smart). Toggle the globe
+#    icon to research over Tor.
 ```
 
 ## Docs

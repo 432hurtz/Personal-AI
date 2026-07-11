@@ -7,7 +7,7 @@
 #   BASE=qwen2.5-coder:3b NAME=joe ./scripts/build-guarded-model.sh
 set -euo pipefail
 
-BASE="${BASE:-qwen2.5-coder:7b}"
+BASE="${BASE:-qwen2.5-coder:3b}"   # 3b = fast daily driver
 NAME="${NAME:-joe}"
 NUM_CTX="${NUM_CTX:-4096}"
 TEMPERATURE="${TEMPERATURE:-0.4}"
