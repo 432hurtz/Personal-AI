@@ -57,6 +57,7 @@ docker compose up -d
 - **[docs/REMOTE-ACCESS.md](docs/REMOTE-ACCESS.md)** — SSH from your phone (LAN or Tailscale), no open ports
 - **[docs/CODING.md](docs/CODING.md)** — connect VS Code / Aider to local Ollama; let Joe edit its own code
 - **[docs/AGENT-CONTROL.md](docs/AGENT-CONTROL.md)** — give Joe permission-gated control of files + system
+- **[docs/CONVERSATIONS.md](docs/CONVERSATIONS.md)** — organize, separate, delete, and truly purge chats + memory
 - **[docs/HARDWARE.md](docs/HARDWARE.md)** — honest speed expectations + upgrade path
 
 ## Set your own rules
